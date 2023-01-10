@@ -18,10 +18,10 @@ exports.getWeatherAtDay = async function (day) {
 exports.getWeatherDayInRange = async function (day, years) {
     // TODO: format or add leading 0
     const date = new Date(day);
-    const dayMonth = '-' + (date.getMonth() + 1) + '-' + String(date.getDate()).padStart(2, '0');
+    const dayMonth = '-' + String((date.getMonth() + 1)).padStart(2, 0) + '-' + String(date.getDate()).padStart(2, '0');
     console.log(`dayMonth = ${dayMonth}`);
     const result = await DailyTemperature.find({date: {$regex: dayMonth}})
-        .sort({"date": -1})
+        .sort({"date": 1})
         .limit(years || Number.MAX_SAFE_INTEGER);
     console.log(`weather for ${day} in ${years | 13} years: ${result}`);
     return result;

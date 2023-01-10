@@ -9,7 +9,7 @@ const temperatureSchema = new mongoose.Schema({
     afternoonTemperature: Number,
     eveningTemperature: Number,
     nightTemperature: Number
-}, { collection : 'weather-archieve' });
+}, { collection : 'weather_archive' });
 
 exports.temperatureSchema = temperatureSchema;
 exports.DailyTemperature = mongoose.model('DailyTemperature', temperatureSchema);
