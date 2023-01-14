@@ -56,7 +56,8 @@ export class AppComponent implements OnInit, OnDestroy {
   /* minDate: Date = new Date('2010-01-01');
    maxDate: Date = new Date('2022-12-31');*/
   data: WeatherData[] = [];
-  availableYears: number[] = [1, 2, 3 , 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  // TODO: Add endpoint to fetch data dynamically
+  availableYears: number[] = [...Array(14).keys()].map(i => i+1);
   chartConfig: ExportChart = DEFAULT_CHART_CONFIG;
   private $subject: Subject<void> = new Subject<void>();
 
