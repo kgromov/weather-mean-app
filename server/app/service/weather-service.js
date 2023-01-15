@@ -61,3 +61,75 @@ exports.getWeatherDayInRange = async function (day, years) {
     console.log(`weather for ${day} in ${years | 13} years: ${result}`);
     return result;
 }
+
+exports.getYearsToShow = async function () {
+    console.log('getYearsToShow');
+    var pipeline = [
+        // {
+        //     $project: {
+        //         date: {
+        //             $toDecimal: "$date",
+        //         },
+        //     },
+        // },
+        {
+            $group: {
+                _id: null,
+                min_date: {
+                    $min: "$date",
+                },
+                max_date: {
+                    $max: "$date",
+                },
+            },
+        },
+        {
+            $project: {
+                min_date: {
+                    $toDate: "$min_date",
+                },
+                max_date: {
+                    $toDate: "$max_date",
+                },
+                diff: {
+                    $dateDiff: {
+                        startDate: "$min_date",
+                        endDate: "$max_date",
+                        unit: "year",
+                    },
+                },
+            },
+        },
+    ];
+
+    var pipelineLocal = [
+        {
+            $group: {
+                _id: null,
+                min_date: {
+                    $min: "$date",
+                },
+                max_date: {
+                    $max: "$date",
+                },
+            },
+        },
+        {
+            $project: {
+                minYear: {
+                    $year: "$min_date",
+                },
+                maxYear: {
+                    $year: "$max_date",
+                }
+            },
+        },
+    ];
+
+    const result = await DailyTemperature.aggregate(pipelineLocal);
+    console.log('weather for ' + JSON.stringify(result) + ' years');
+    return result[0].maxYear - result[0].minYear + 1;
+}
+
+
+

@@ -56,8 +56,7 @@ export class AppComponent implements OnInit, OnDestroy {
   /* minDate: Date = new Date('2010-01-01');
    maxDate: Date = new Date('2022-12-31');*/
   data: WeatherData[] = [];
-  // TODO: Add endpoint to fetch data dynamically
-  availableYears: number[] = [...Array(14).keys()].map(i => i+1);
+  availableYears: number[] = [];
   chartConfig: ExportChart = DEFAULT_CHART_CONFIG;
   private $subject: Subject<void> = new Subject<void>();
 
@@ -78,6 +77,12 @@ export class AppComponent implements OnInit, OnDestroy {
       selectedDate: null,
       years: null
     });
+
+    this.weatherService.getYearsToShpw()
+      .subscribe(years => {
+        console.log('Years = ', years);
+        this.availableYears = [...Array(years || 14).keys()].map(i => i + 1)
+      });
 
     this.selectedDate.valueChanges
       .pipe(takeUntil(this.$subject))
