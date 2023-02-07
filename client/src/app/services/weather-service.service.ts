@@ -29,7 +29,7 @@ export class WeatherServiceService {
     return this.http.get<WeatherData[]>(`${this.baseUrl}/weather/${day}`, {params: params});
   }
 
-  public getYearsToShpw(): Observable<Number> {
-    return this.http.get<Number>(`${this.baseUrl}/weather/years/`);
+  public getYearsToShow(): Observable<Number> {
+    return this.http.get<Number>(`${this.baseUrl}/weather/years`);
   }
 }

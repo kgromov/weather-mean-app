@@ -131,5 +131,152 @@ exports.getYearsToShow = async function () {
     return result[0].maxYear - result[0].minYear + 1;
 }
 
+exports.getYearsBySeasonsTemperature = async function () {
+    const projectTemperaturesStage = {
+        $project: {
+            _id: null,
+            month: {
+                $month: "$date",
+            },
+            year: {
+                $year: "$date",
+            },
+            minTemp: {
+                $min: [
+                    "$morningTemperature",
+                    "$afternoonTemperature",
+                    "$nightTemperature",
+                ]
+            },
+            maxTemp: {
+                $max: [
+                    "$morningTemperature",
+                    "$afternoonTemperature",
+                    "$nightTemperature",
+                ]
+            },
+            avgTemp: {
+                $avg: [
+                    "$morningTemperature",
+                    "$afternoonTemperature",
+                    "$nightTemperature",
+                ]
+            }
+        }
+    };
+
+    const projectSeasonStage = {
+        $addFields: {
+            season: {
+                $switch: {
+                    branches: [
+                        {
+                            case: {
+                                $or: [
+                                    {
+                                        $eq: ["$month", 1],
+                                    },
+                                    {
+                                        $eq: ["$month", 2],
+                                    },
+                                    {
+                                        $eq: ["$month", 12],
+                                    }
+                                ]
+                            },
+                            then: "WINTER",
+                        },
+                        {
+                            case: {
+                                $and: [
+                                    {
+                                        $gt: ["$month", 2],
+                                    },
+                                    {
+                                        $lt: ["$month", 6],
+                                    }
+                                ]
+                            },
+                            then: "SPRING",
+                        },
+                        {
+                            case: {
+                                $and: [
+                                    {
+                                        $gt: ["$month", 5],
+                                    },
+                                    {
+                                        $lt: ["$month", 9],
+                                    }
+                                ]
+                            },
+                            then: "SUMMER",
+                        },
+                        {
+                            case: {
+                                $and: [
+                                    {
+                                        $gt: ["$month", 8],
+                                    },
+                                    {
+                                        $lt: ["$month", 12],
+                                    }
+                                ]
+                            },
+                            then: "AUTUMN",
+                        },
+                    ],
+                    default: "Not found",
+                },
+            },
+        },
+    };
+
+    const groupByYearSeasonStage = {
+        $group: {
+            _id: {
+                year: "$year",
+                season: "$season",
+            },
+            minTemp: {
+                $min: "$minTemp",
+            },
+            maxTemp: {
+                $max: "$maxTemp",
+            },
+            avgTemp: {
+                $avg: "$avgTemp",
+            }
+        }
+    };
+
+    const finalMappingStage = {
+        $project: {
+            _id: 0,
+            year: "$_id.year",
+            season: "$_id.season",
+            minTemp: "$minTemp",
+            maxTemp: "$maxTemp",
+            avgTemp: "$avgTemp",
+        },
+    };
+
+    const sortByYearStage = {
+        $sort: {year: 1}
+    };
+
+    const pipeline = [
+        projectTemperaturesStage,
+        projectSeasonStage,
+        groupByYearSeasonStage,
+        finalMappingStage,
+        sortByYearStage
+    ];
+
+    const result = await DailyTemperature.aggregate(pipeline);
+    console.log('Seasons temperature ' + JSON.stringify(result) + ' by years');
+    return result;
+}
+
 
 

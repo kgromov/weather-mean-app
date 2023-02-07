@@ -23,7 +23,7 @@ mongoose.connect(dbConfig.uri, {useNewUrlParser: true, useUnifiedTopology: true}
 
 // test
 app.get("/", (req, res) => {
-    res.json({ message: "Helth check" });
+    res.json({ message: "Health check" });
 });
 
 app.listen(process.env.PORT | 8080, () => {

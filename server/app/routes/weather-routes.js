@@ -2,9 +2,14 @@ const express = require("express");
 const weatherService = require('./../service/weather-service');
 const router = express.Router();
 
-router.get("/years/", async (req, res) => {
+router.get("/years", async (req, res) => {
     const yearsToShow = await weatherService.getYearsToShow();
     res.status(200).json(yearsToShow);
+});
+
+router.get("/seasonsInYear", async (req, res) => {
+    const seasonsWeather = await weatherService.getYearsBySeasonsTemperature()
+    res.status(200).json(seasonsWeather);
 });
 
 router.get("/current", async (req, res) => {
