@@ -21,7 +21,6 @@ enum AggregateType {
 })
 export class SeasonTemperatureComponent implements OnInit, OnDestroy {
   availableYears: number [] = [];
-  // FIXME: Add mapping to YearBySeasonTemperature
   data: SeasonTemperature[] = [];
   chartConfig: ExportChart = SEASONS_CHART_CONFIG;
   // @ts-ignore

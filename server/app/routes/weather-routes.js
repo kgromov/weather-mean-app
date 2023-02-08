@@ -12,6 +12,11 @@ router.get("/seasonsInYear", async (req, res) => {
     res.status(200).json(seasonsWeather);
 });
 
+router.get("/summary", async (req, res) => {
+    const yearsWeather = await weatherService.getYearsSummary()
+    res.status(200).json(yearsWeather);
+});
+
 router.get("/current", async (req, res) => {
     const weatherForToday = await weatherService.getWeatherForToday();
     res.status(200).json(weatherForToday);

@@ -278,5 +278,79 @@ exports.getYearsBySeasonsTemperature = async function () {
     return result;
 }
 
+exports.getYearsSummary = async function () {
+    const projectTemperaturesStage = {
+        $project: {
+            _id: null,
+            year: {
+                $year: "$date",
+            },
+            minTemp: {
+                $min: [
+                    "$morningTemperature",
+                    "$afternoonTemperature",
+                    "$nightTemperature",
+                ]
+            },
+            maxTemp: {
+                $max: [
+                    "$morningTemperature",
+                    "$afternoonTemperature",
+                    "$nightTemperature",
+                ]
+            },
+            avgTemp: {
+                $avg: [
+                    "$morningTemperature",
+                    "$afternoonTemperature",
+                    "$nightTemperature",
+                ]
+            }
+        }
+    };
+
+    const groupByYearStage = {
+        $group: {
+            _id: {
+                year: "$year"
+            },
+            minTemp: {
+                $min: "$minTemp",
+            },
+            maxTemp: {
+                $max: "$maxTemp",
+            },
+            avgTemp: {
+                $avg: "$avgTemp",
+            }
+        }
+    };
+
+    const removeIdStage = {
+        $project: {
+            _id: 0,
+            year: "$_id.year",
+            min: "$minTemp",
+            max: "$maxTemp",
+            avg: "$avgTemp",
+        },
+    };
+
+    const sortByYearStage = {
+        $sort: {year: 1}
+    };
+
+    const pipeline = [
+        projectTemperaturesStage,
+        groupByYearStage,
+        removeIdStage,
+        sortByYearStage
+    ];
+
+    const result = await DailyTemperature.aggregate(pipeline);
+    console.log('Temperature ' + JSON.stringify(result) + ' by years');
+    return result;
+}
+
 
 
