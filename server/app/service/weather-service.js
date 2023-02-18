@@ -58,7 +58,7 @@ exports.getWeatherDayInRange = async function (day, years) {
     ];
 
     const result = await DailyTemperature.aggregate(pipeline);
-    console.log(`weather for ${day} in ${years | 13} years: ${result}`);
+    console.log(`weather for ${day} in ${years | 13} years: ${JSON.stringify(result)}`);
     return result;
 }
 
@@ -85,6 +85,7 @@ exports.getYearsToShow = async function () {
         },
         {
             $project: {
+                _id: 0,
                 min_date: {
                     $toDate: "$min_date",
                 },
@@ -250,14 +251,25 @@ exports.getYearsBySeasonsTemperature = async function () {
         }
     };
 
+    const aggregateSeasonsByYear = {
+        $group: {
+            _id: "$_id.year",
+            seasons: {
+                $push: {
+                    season: "$_id.season",
+                    minTemp: "$minTemp",
+                    maxTemp: "$maxTemp",
+                    avgTemp: "$avgTemp",
+                },
+            },
+        },
+    };
+
     const finalMappingStage = {
         $project: {
             _id: 0,
-            year: "$_id.year",
-            season: "$_id.season",
-            minTemp: "$minTemp",
-            maxTemp: "$maxTemp",
-            avgTemp: "$avgTemp",
+            year: "$_id",
+            seasons: 1,
         },
     };
 
@@ -269,6 +281,7 @@ exports.getYearsBySeasonsTemperature = async function () {
         projectTemperaturesStage,
         projectSeasonStage,
         groupByYearSeasonStage,
+        aggregateSeasonsByYear,
         finalMappingStage,
         sortByYearStage
     ];

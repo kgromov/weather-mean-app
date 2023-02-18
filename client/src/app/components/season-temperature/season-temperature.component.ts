@@ -1,5 +1,5 @@
 import {Component, Inject, LOCALE_ID, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {Season, SeasonTemperature} from "../../model/season-data";
+import {Season, SeasonTemperature, YearBySeasonTemperature} from "../../model/season-data";
 import {ExportChart, SEASONS_CHART_CONFIG} from "../../model/chart-config";
 import {ChartjsComponent} from "@ctrl/ngx-chartjs";
 import {SeasonTemperatureService} from "../../services/season-temperatue.service";
@@ -21,7 +21,7 @@ enum AggregateType {
 })
 export class SeasonTemperatureComponent implements OnInit, OnDestroy {
   availableYears: number [] = [];
-  data: SeasonTemperature[] = [];
+  data: YearBySeasonTemperature[] = [];
   chartConfig: ExportChart = SEASONS_CHART_CONFIG;
   // @ts-ignore
   @ViewChild(ChartjsComponent, {static: false}) chart: ChartjsComponent;
@@ -73,37 +73,39 @@ export class SeasonTemperatureComponent implements OnInit, OnDestroy {
     this.aggregateType.setValue(aggregateType);
   }
 
-  private updateChartData(data: SeasonTemperature[]): void {
+  private updateChartData(data: YearBySeasonTemperature[]): void {
     const labelsData: any[] = [];
     const winterData: any[] = [];
     const springData: any[] = [];
     const summerData: any[] = [];
     const autumnData: any[] = [];
     data
-      .forEach(season => {
-        console.log('season = ', season);
-        labelsData.push(season.year);
-        const temperature = this.getTemperatureByAggregate(season);
-        switch (season.season) {
-          case Season.WINTER:
-            winterData.push(temperature);
-            break;
-          case Season.SPRING:
-            springData.push(temperature);
-            break;
-          case Season.SUMMER:
-            summerData.push(temperature);
-            break;
-          case Season.AUTUMN:
-            autumnData.push(temperature);
-            break;
-          default:
-            console.error(`Unknown season ${season}`);
-            break;
-        }
+      .forEach(yearSeasons => {
+        console.log('yearSeasons = ', yearSeasons);
+        labelsData.push(yearSeasons.year);
+        const seasons: SeasonTemperature[] = yearSeasons.seasons;
+        seasons.forEach(season => {
+          const temperature = this.getTemperatureByAggregate(season);
+          switch (season.season) {
+            case Season.WINTER:
+              winterData.push(temperature);
+              break;
+            case Season.SPRING:
+              springData.push(temperature);
+              break;
+            case Season.SUMMER:
+              summerData.push(temperature);
+              break;
+            case Season.AUTUMN:
+              autumnData.push(temperature);
+              break;
+            default:
+              console.error(`Unknown season ${yearSeasons}`);
+              break;
+          }
+        })
       });
-
-    this.chartConfig.data.labels = [...new Set(labelsData)].sort();
+    this.chartConfig.data.labels = [...labelsData];
     const datasets: ChartDataset[] = this.chartConfig.data.datasets;
     datasets[0].data = [...winterData];
     datasets[1].data = [...springData];

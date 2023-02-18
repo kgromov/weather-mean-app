@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {environment} from "../../environments/environment";
-import {SeasonTemperature, YearSummary} from "../model/season-data";
+import {YearBySeasonTemperature, YearSummary} from "../model/season-data";
 
 @Injectable({
   providedIn: 'root'
@@ -21,11 +21,11 @@ export class SeasonTemperatureService {
     return this.http.get<YearSummary[]>(`${this.baseUrl}/weather/summary`, {params: params});
   }
 
-  public getSeasonsTemperature(years?: number): Observable<SeasonTemperature[]> {
+  public getSeasonsTemperature(years?: number): Observable<YearBySeasonTemperature[]> {
     const params: any = {};
     if (years) {
       params.years = years;
     }
-    return this.http.get<SeasonTemperature[]>(`${this.baseUrl}/weather/seasonsInYear`, {params: params});
+    return this.http.get<YearBySeasonTemperature[]>(`${this.baseUrl}/weather/seasonsInYear`, {params: params});
   }
 }
