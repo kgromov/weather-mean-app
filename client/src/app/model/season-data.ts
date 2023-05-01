@@ -18,6 +18,18 @@ export interface YearBySeasonTemperature {
   seasons: SeasonTemperature[];
 }
 
+export interface YearByMonthTemperature {
+  year: number,
+  seasons: SeasonTemperature[];
+}
+
+export interface MonthTemperature {
+  month: number,
+  minTemp: number
+  maxTemp: number
+  avgTemp: number
+}
+
 export interface YearSummary {
   year: number,
   min: number,
