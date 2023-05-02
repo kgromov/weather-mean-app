@@ -1,34 +1,50 @@
-const logger = require('winston');
+const winston = require('winston');
 // require('winston-mongodb');
 require('express-async-errors');
 
-module.exports = function() {
-    logger.handleExceptions(
-        new logger.transports.Console({ colorize: true, prettyPrint: true }),
-        new logger.transports.File({ filename: 'error.log' })
+// nice declaration way but not working for some reason if just export and use
+const logger = winston.createLogger({
+    level: process.env.NODE_ENV === 'prod' ? 'info' : 'debug',
+    transports: [
+        new winston.transports.Console(),
+        new winston.transports.File({filename: 'logs/logfile.log'})
+    ],
+    format: winston.format.combine(
+        winston.format.colorize({all: true}),
+        winston.format.simple()
+    ),
+    handleExceptions: true,
+    handleRejections: true
+});
+
+module.exports = function () {
+    const logLevel = process.env.NODE_ENV === 'prod' ? 'info' : 'debug';
+    const fileAppender = new winston.transports.File({level: logLevel, filename: 'logs/logfile.log'});
+    const consoleAppender = new winston.transports.Console({level: logLevel, colorize: true, prettyPrint: true});
+    // in order to store to logs to db (aka appender in sl4j)
+    /* const mongoDbAppender = new winston.transports.MongoDB( {
+        db: 'mongodb://localhost/test',
+        level: 'info'
+    });
+*/
+    winston.add(consoleAppender);
+    winston.add(fileAppender);
+    // winston.add(mongoDbAppender);
+
+    winston.exceptions.handle(
+        consoleAppender,
+        fileAppender
     );
+
+    // simply not working
+    // winston.handleRejections(
+    /*winston.rejections.handle(
+        consoleAppender,
+        fileAppender
+    );*/
 
     // old workaround to handle rejections (async errors)
-   /* process.on('unhandledRejection', (ex) => {
+    process.on('unhandledRejection', (ex) => {
         throw ex;
-    });*/
-    logger.handleRejections(
-        new logger.transports.Console({ colorize: true, prettyPrint: true }),
-        new logger.transports.File({ filename: 'error.log' })
-    );
-
-    logger.add(logger.transports.File, { filename: 'logfile.log' });
-    logger.add(logger.transports.Console({level: 'debug'}))
-
- /*   new (winston.transports.Console)({ level: 'error' }),
-     new (winston.transports.File)({ filename: 'somefile.log' })*/
-
-    // in order to store to logs to db (aka appender in sl4j)
-  /*  winston.add(winston.transports.MongoDB, {
-        db: 'mongodb://localhost/vidly',
-        level: 'info'
-    });*/
+    });
 }
-
-// TODO: seems it's required to define loggeer with transports and export from here
-// figure out why log transports are not applied

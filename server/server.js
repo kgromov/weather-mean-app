@@ -2,7 +2,7 @@ const express = require("express");
 const logger = require("winston");
 const app = express();
 
-require("./app/startup/logging");
+require("./app/startup/logging")();
 require("./app/startup/web-config")(app);
 require("./app/startup/db-config")();
 
