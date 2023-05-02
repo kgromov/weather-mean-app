@@ -2,7 +2,7 @@ const express = require("express");
 const morgan = require("morgan")
 const config = require("config")
 const cors = require("cors");
-const logger = require("winston");
+const logger = require("./logging");
 
 const healthCheckRoute = require("../routes/healh-check-routes");
 const weatherRoute = require("../routes/weather-routes");

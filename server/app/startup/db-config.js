@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const logger = require("winston");
+const logger = require("./logging");
 
 const dbName = process.env.DB_NAME || 'test';
 const dbUser = process.env.DB_USER;
