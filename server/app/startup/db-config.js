@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const logger = require("winston");
-const dbConfig = require("../middleware/db-config");
 
 const dbName = process.env.DB_NAME || 'test';
 const dbUser = process.env.DB_USER;

@@ -31,3 +31,4 @@ module.exports = function() {
 }
 
 // TODO: seems it's required to define loggeer with transports and export from here
+// figure out why log transports are not applied
