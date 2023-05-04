@@ -1,31 +1,9 @@
 const express = require("express");
-const bodyParser = require("body-parser");
-const cors = require("cors");
-const mongoose = require("mongoose");
-
-const dbConfig = require("./app/config/db-config");
-const weatherRoute = require("./app/routes/weather-routes");
-
+const logger = require("./app/startup/logging");
 const app = express();
-const corsOptions = {
-    origin: "http://localhost:4200"
-};
 
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(cors(corsOptions));
-app.use('/weather', weatherRoute);
+require("./app/startup/web-config")(app);
+require("./app/startup/db-config")();
 
-// establish connection
-mongoose.connect(dbConfig.uri, {useNewUrlParser: true, useUnifiedTopology: true})
-    .then(() => console.log('Successfully connected to MongoDB at ...'))
-    .catch(e => console.error('Failed connected to MongoDB...', e));
-
-// test
-app.get("/", (req, res) => {
-    res.json({ message: "Health check" });
-});
-
-app.listen(process.env.PORT | 8080, () => {
-    console.log("Server is started on post 9000");
-});
+const port = process.env.PORT || 8080;
+app.listen(port, () =>  logger.info(`Server is started on port ${port}`));
