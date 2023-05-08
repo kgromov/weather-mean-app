@@ -6,6 +6,7 @@ const logger = require("./logging");
 
 const healthCheckRoute = require("../routes/healh-check-routes");
 const weatherRoute = require("../routes/weather-routes");
+const syncRoute = require("../routes/temperature-sync-routes");
 const errorHandler = require("../middleware/request-error-handler");
 
 module.exports = function (app) {
@@ -19,5 +20,6 @@ module.exports = function (app) {
     app.use(morgan('tiny'));
     app.use('/health', healthCheckRoute);
     app.use('/weather', weatherRoute);
+    app.use('/sync', syncRoute);
     app.use(errorHandler);
 }

@@ -1,4 +1,6 @@
 const logger = require('./../startup/logging');
+const DailyTemperature = require("../model/daily-temperature").DailyTemperature;
+
 // ========== common stages ==========
 const projectTemperaturesStage = {
     $project: {
@@ -33,7 +35,7 @@ const projectTemperaturesStage = {
     },
 };
 // =========== summary ==============
-const DailyTemperature = require("./../model/dayli-temperature").DailyTemperature;
+// FIXME: below 2 methods are simply incorrect - there is no 'data' field in document collection
 exports.getWeatherForToday = async function () {
     const currentDate = new Date().toISOString()/*.slice(0, 10)*/;
     const result = await DailyTemperature.findOne({data: currentDate});
