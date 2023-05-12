@@ -4,7 +4,7 @@ const https = require('https');
 const URL = require('url');
 
 exports.get = function(url) {
-    logger.debug('GET by url = ', url);
+    logger.debug(`GET by url = ${url}`);
     return new Promise((resolve, reject) => {
         let client = http;
         // const urlInfo = URL.parse(url, true);

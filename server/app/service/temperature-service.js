@@ -18,9 +18,9 @@ exports.syncForToday = async function () {
         .limit(1);
     const currentDate = new Date();
     const latestDate = new Date(latestDayTemperature["0"].date);
-    logger.info('Sync date in range [', latestDate, '; ', currentDate, ']');
+    logger.info(`Sync date in range [${latestDate}; ${currentDate}]`);
     const daysDiff = DateUtils.getDatesDiffInDays(latestDate, currentDate);
-    logger.silly('Calculated days diff = ', daysDiff);
+    logger.debug(`Calculated days diff = ${daysDiff}`);
     if (daysDiff === 0) {
         return;
     }
@@ -28,7 +28,7 @@ exports.syncForToday = async function () {
         ? [...Array(daysDiff).keys()].map(i => i + 1)
             .map(day => DateUtils.addDays(latestDate, day))
             .map(date => date.toISOString().slice(0, 10))
-        : [...currentDate.toISOString().slice(0, 10)];
+        : [currentDate.toISOString().slice(0, 10)];
 
     // save 1 record
     /*logger.debug('GET for date = ', syncDates[0]);
@@ -39,9 +39,9 @@ exports.syncForToday = async function () {
 
     syncDates.forEach(async syncDate => {
         const temperatureMeasurements = await syncSinceDate(syncDate);
-        logger.silly('temperatureMeasurementsDto = ', temperatureMeasurements);
+        logger.silly(`temperatureMeasurementsDto = ${temperatureMeasurements}`);
         let record = await new DailyTemperature({...temperatureMeasurements}).save();
-        logger.debug('Saved new daily temperature = ', record);
+        logger.info(`Saved new daily temperature = ${record}`);
     });
     /*const dailyTemperatures = syncDates.map(async syncDate => await syncSinceDate(syncDate))
         .map(temp => new DailyTemperature({...temp}));*/
@@ -69,6 +69,6 @@ function extractDailyTemperature(date, weatherContent) {
             let temperature = Number.parseInt(temperatureCells[i].text.trim());
             return new WeatherMeasurementDto(time, temperature);
         });
-    logger.debug('Daily measurements = ', measurements);
+    logger.debug(`Daily measurements = ${measurements}`);
     return new TemperatureMeasurementsDto(new Date(date), measurements);
 }

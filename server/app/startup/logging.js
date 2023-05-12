@@ -1,25 +1,44 @@
 const winston = require('winston');
-// require('winston-mongodb');
+require('winston-mongodb');
 require('express-async-errors');
+
+const dbName = process.env.DB_NAME || 'test';
+const dbUser = process.env.DB_USER;
+const dbPassword = process.env.DB_PASSWORD;
+const profile = process.env.NODE_ENV;
+const localUrl = `mongodb://localhost:27017/${dbName}`;
+const clusterUrl = `mongodb+srv://${dbUser}:${dbPassword}@cluster0.kxhtq.mongodb.net/${dbName}`;
+const uri = profile === 'prod' ? clusterUrl: localUrl;
+const logLevel = profile === 'prod' ? 'info' : 'debug';
 
 // configure and export own logger - is preferable option
 const logger = winston.createLogger({
-    level: process.env.NODE_ENV === 'prod' ? 'info' : 'debug',
+    level: logLevel,
     transports: [
         new winston.transports.Console(),
-        new winston.transports.File({filename: 'logs/logfile.log'})
+        new winston.transports.File({filename: 'logs/logfile.log'}),
+        new winston.transports.MongoDB( {
+            db: uri
+        })
     ],
     format: winston.format.combine(
-        winston.format.colorize({all: true}),
+        winston.format.uncolorize(),
         winston.format.simple()
     ),
     handleExceptions: true,
     handleRejections: true,
     exceptionHandlers: [
-        new winston.transports.File({ filename: 'logs/error.log' })
+        new winston.transports.File({ filename: 'logs/error.log' }),
+        new winston.transports.MongoDB( {
+            db: uri
+        })
     ],
     rejectionHandlers: [
-        new winston.transports.File({ filename: 'logs/error.log' })
+        new winston.transports.File({ filename: 'logs/error.log' }),
+        new winston.transports.MongoDB( {
+            db: uri
+            // collection: 'error'
+        })
     ]
 });
 
